@@ -1,5 +1,8 @@
 package com.exchangeify.authorisation.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +20,9 @@ public class User {
         private String phoneNumber;
         private String createdDate;
         private String privateKey;
+        private String password;
+        private Set<String> roles = new HashSet<>();
+        private String authProvider; // 'GOOGLE' or 'BASIC'
         
         public String getId() {
             return id;
@@ -66,15 +72,35 @@ public class User {
         public void setPrivateKey(String privateKey) {
             this.privateKey = privateKey;
         }
+        public String getPassword() {
+            return password;
+        }
+        public void setPassword(String password) {
+            this.password = password;
+        }
+        public Set<String> getRoles() {
+            return roles;
+        }
+        public void setRoles(Set<String> roles) {
+            this.roles = roles;
+        }
+        public String getAuthProvider() {
+            return authProvider;
+        }
+        public void setAuthProvider(String authProvider) {
+            this.authProvider = authProvider;
+        }
         
         @Override
         public String toString() {
             return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId=" + emailId
                     + ", profilePicUrl=" + profilePicUrl + ", phoneNumber=" + phoneNumber + ", createdDate="
-                    + createdDate + ", privateKey=" + privateKey + "]";
+                    + createdDate + ", privateKey=" + privateKey + ", password=" + password + ", roles=" + roles
+                    + ", authProvider=" + authProvider + "]";
         }
         public User(String id, String firstName, String lastName, String emailId, String profilePicUrl,
-                String phoneNumber, String createdDate, String privateKey) {
+                String phoneNumber, String createdDate, String privateKey, String password, Set<String> roles,
+                String authProvider) {
             this.id = id;
             this.firstName = firstName;
             this.lastName = lastName;
@@ -83,6 +109,9 @@ public class User {
             this.phoneNumber = phoneNumber;
             this.createdDate = createdDate;
             this.privateKey = privateKey;
+            this.password = password;
+            this.roles = roles;
+            this.authProvider = authProvider;
         }
         
 		

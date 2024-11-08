@@ -17,7 +17,7 @@ public class authServiceImpl implements authService{
 
     @Override
     public User save(User entity) {
-        User savedUser =  myUserRepository.save(new User("TDN001","test","Data","testData@yopmail.com","http://godknows.com/","8765456789","6/7/2021","cvghgf456dfghgfd6567.7656788765jhghjhghh67t6t67tt7g7g7g"));
+        User savedUser =  myUserRepository.save(entity);
         return savedUser;
     }
 
