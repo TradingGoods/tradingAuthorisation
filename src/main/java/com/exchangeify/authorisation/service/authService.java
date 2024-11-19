@@ -1,16 +1,11 @@
 package com.exchangeify.authorisation.service;
 
-import java.util.List;
+import org.springframework.http.ResponseEntity;
 
-
-import com.exchangeify.authorisation.model.User;
+import com.exchangeify.authorisation.dto.RegisterDTO;
 
 public interface authService {
     
 
-    public User save(User entity);
-
-    public List<User> findAll();
-    public User findById(String id);
-    public void deleteById(String id);
+   public ResponseEntity<String> registerUser(RegisterDTO userDetails);
 }

@@ -5,6 +5,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 
 public interface OAuth2Service {
 
-    ResponseEntity<?> authenticateRequest(OAuth2AuthenticationToken authentication);
+    // ResponseEntity<?> authenticateRequest(OAuth2AuthenticationToken authentication);
     
 }

@@ -1,39 +1,77 @@
 package com.exchangeify.authorisation.service.impl;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.exchangeify.authorisation.model.User;
-import com.exchangeify.authorisation.repository.userRepository;
+import com.exchangeify.authorisation.dto.RegisterDTO;
+import com.exchangeify.authorisation.model.RoleEntity;
+import com.exchangeify.authorisation.model.UserEntity;
+import com.exchangeify.authorisation.repository.RoleRepository;
+import com.exchangeify.authorisation.repository.UserRepository;
+// import com.exchangeify.authorisation.repository.userRepository;
 import com.exchangeify.authorisation.service.authService;
 
 @Service
 public class authServiceImpl implements authService{
 
     @Autowired
-    private userRepository myUserRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    // private userRepository myUserRepository;
 
     @Override
-    public User save(User entity) {
-        User savedUser =  myUserRepository.save(entity);
-        return savedUser;
-    }
+    public ResponseEntity<String> registerUser(RegisterDTO userInput){
+        if(userRepository.existsByEmailId(userInput.getEmailId())){
+            return new ResponseEntity<>("User already exist",HttpStatus.BAD_REQUEST);
+        }
+        Date currentDate = new Date();
+        UserEntity user = new UserEntity();
+        user.setEmailId(userInput.getEmailId());
+        user.setCreatedDate(currentDate.toString());
+        user.setAuthProvider("manual");
+        user.setFirstName(userInput.getFirstName());
+        user.setLastName(userInput.getLastName());
+        user.setIsValid("false");
+        user.setPhoneNumber(userInput.getPhoneNumber());
+        user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 
-    @Override
-    public List<User> findAll() {
-        return myUserRepository.findAll();
+        RoleEntity roles = roleRepository.findByName("USER").get();
+        user.setRoles(Collections.singletonList(roles));
+        userRepository.save(user);
+        return new ResponseEntity<>("user registered", HttpStatus.OK);
     }
+    // @Override
+    // public UserEntity save(UserEntity entity) {
+    //     UserEntity savedUser =  myUserRepository.save(entity);
+    //     return savedUser;
+    // }
 
-    @Override
-    public User findById(String id) {
-        return myUserRepository.findById(id).orElse(null);
-    }
+    // @Override
+    // public List<UserEntity> findAll() {
+    //     return myUserRepository.findAll();
+    // }
 
-    @Override
-    public void deleteById(String id) {
-        myUserRepository.deleteById(id);
-    }
+    // @Override
+    // public UserEntity findById(int id) {
+    //     return myUserRepository.findById(id).orElse(null);
+    // }
+
+    // @Override
+    // public void deleteById(String id) {
+    //     // myUserRepository.deleteById(id);
+    // }
     
 }

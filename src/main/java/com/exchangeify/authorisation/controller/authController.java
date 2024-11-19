@@ -1,43 +1,48 @@
 package com.exchangeify.authorisation.controller;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.exchangeify.authorisation.model.User;
+import com.exchangeify.authorisation.dto.RegisterDTO;
 import com.exchangeify.authorisation.service.authService;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/auth")
 public class authController {
 
     @Autowired
     private authService myAuthService; 
 
-    @PostMapping
-    public User createEntity(@RequestBody User entity) {
-        return myAuthService.save(entity);
+    @PostMapping("register")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterDTO userInput) {
+        ResponseEntity<String> response = myAuthService.registerUser(userInput);
+        
+        return response;
+        
     }
+    
+    // @PostMapping
+    // public UserEntity createEntity(@RequestBody UserEntity entity) {
+    //     return myAuthService.save(entity);
+    // }
 
-    @GetMapping
-    public List<User> getAllEntities() {
-        return myAuthService.findAll();
-    }
+    // @GetMapping
+    // public List<UserEntity> getAllEntities() {
+    //     return myAuthService.findAll();
+    // }
 
-    @GetMapping("/{id}")
-    public User getEntityById(@PathVariable String id) {
-        return myAuthService.findById(id);
-    }
+    // @GetMapping("/{id}")
+    // public UserEntity getEntityById(@PathVariable int id) {
+    //     return myAuthService.findById(id);
+    // }
 
-    @DeleteMapping("/{id}")
-    public void deleteEntityById(@PathVariable String id) {
-        myAuthService.deleteById(id);
-    }
+    // @DeleteMapping("/{id}")
+    // public void deleteEntityById(@PathVariable String id) {
+    //     myAuthService.deleteById(id);
+    // }
 }
