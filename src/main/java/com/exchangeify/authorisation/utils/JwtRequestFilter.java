@@ -18,41 +18,56 @@ import com.exchangeify.authorisation.security.CustomUserDetailService;
 import com.exchangeify.authorisation.service.authService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JwtRequestFilter extends OncePerRequestFilter {    
-        @Autowired
-        private JwtUtil jwtUtil;
-    
-        @Autowired
-        private CustomUserDetailService customUserDetailService;
-    
-        @Override
-        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-                throws ServletException, IOException {
-            final String authorizationHeader = request.getHeader("Authorization");
-    
-            String username = null;
-            String jwt = null;
-    
+public class JwtRequestFilter extends OncePerRequestFilter {
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private CustomUserDetailService customUserDetailService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        String username = null;
+        String jwt = null;
+        try{
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7);
-                username = jwtUtil.getUsernameFromToken(jwt);
+                username = jwtUtil.extractUsername(jwt);
             }
-    
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.customUserDetailService.loadUserByUsername(username);
-                if (null != jwt && jwtUtil.validateToken(jwt, userDetails.getUsername(), userDetails.getPassword())) {
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword());
+                if (jwtUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-            chain.doFilter(request, response);
+        } catch (SignatureException | ExpiredJwtException | MalformedJwtException e) {
+            // Send custom response and STOP the filter chain
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            String json = String.format("{\"error\": \"%s\"}", e.getMessage().replace("\"", "\\\""));
+            response.getWriter().write(json);
+            response.getWriter().flush();
+            return; // important: prevent further filter chain execution
         }
+        
+        chain.doFilter(request, response);
+    }
 }

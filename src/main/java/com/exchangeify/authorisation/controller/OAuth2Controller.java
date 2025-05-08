@@ -2,27 +2,45 @@ package com.exchangeify.authorisation.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exchangeify.authorisation.dto.JwtResponseDTO;
+import com.exchangeify.authorisation.dto.LoginRequestDTO;
 import com.exchangeify.authorisation.service.OAuth2Service;
+import com.exchangeify.authorisation.service.authService;
 import com.exchangeify.authorisation.utils.JwtUtil;
 
 import io.jsonwebtoken.Claims;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/auth")
 public class OAuth2Controller {
 
+    private static final Logger logger = LoggerFactory.getLogger(OAuth2Controller.class);
+
 
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private authService myAuthService; 
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
    @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> requestBody) {
@@ -45,6 +63,23 @@ public class OAuth2Controller {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+        // Authentication logic here
+        logger.info("Login request received for email: " + request.getEmailId());
+        logger.info("Login request received for email: " + request.getPassword());
+        logger.info("Login request received for email: " + request);
+
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword())
+        );
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String jwt = jwtUtil.generateToken(userDetails);
+
+        return ResponseEntity.ok(new JwtResponseDTO(jwt));
     }
 }
 
