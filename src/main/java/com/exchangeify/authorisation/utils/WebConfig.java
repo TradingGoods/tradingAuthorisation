@@ -2,11 +2,41 @@ package com.exchangeify.authorisation.utils;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.exchangeify.authorisation.security.CustomUserDetailService;
+
 @Configuration
 public class WebConfig {
+
+    private CustomUserDetailService customUserDetailService;
+    public WebConfig(CustomUserDetailService customUserDetailService) {
+        this.customUserDetailService = customUserDetailService;
+    }
+
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form.disable())
+            .httpBasic(httpBasic -> httpBasic.disable());
+
+        return http.build();
+    }
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -14,11 +44,32 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // Allows CORS requests to all endpoints
-                        .allowedOrigins("http://localhost:8081") // Allow requests from this origin
+                        .allowedOrigins("http://localhost:8081") // Allow requests from this origin, for container
+                        // .allowedOrigins("http://localhost:4200") // for local
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
                         .allowedHeaders("*") // Allow all headers
                         .allowCredentials(true); // Allow credentials like cookies
             }
         };
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailService);
+        authProvider.setPasswordEncoder(passwordEncoder()); // BCrypt recommended
+        return authProvider;
     }
 }

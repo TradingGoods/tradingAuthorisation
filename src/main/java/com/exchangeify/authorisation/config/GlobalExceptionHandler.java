@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,6 +31,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleMalformedJwtException(MalformedJwtException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Malformed JWT token", ex);
     }
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "User not found", ex);
+    }
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
@@ -37,6 +42,8 @@ public class GlobalExceptionHandler {
             "message", ex.getMessage()
         ));
     }
+   
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGenericException(Exception ex) {

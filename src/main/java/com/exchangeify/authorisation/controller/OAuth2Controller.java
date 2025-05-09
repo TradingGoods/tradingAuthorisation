@@ -69,8 +69,8 @@ public class OAuth2Controller {
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         // Authentication logic here
         logger.info("Login request received for email: " + request.getEmailId());
-        logger.info("Login request received for email: " + request.getPassword());
-        logger.info("Login request received for email: " + request);
+        logger.info("Login request received for password: " + request.getPassword());
+        logger.info("Login request received for request: " + request);
 
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword())
