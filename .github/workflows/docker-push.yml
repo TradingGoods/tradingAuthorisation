@@ -1,11 +1,11 @@
-name: Docker Push UI
+name: Docker Push Auth
 
 on:
   push:
     branches:
-      - main # Or your UI's main branch
+      - main # Or your auth service's main branch
     paths:
-      - 'trading_ui/**' # Only trigger if changes in the trading_ui directory
+      - '/**' # Or a more specific path if your Dockerfile is nested
 
 jobs:
   build-and-push:
@@ -24,11 +24,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image (frontend)
+      - name: Build and push Docker image (auth)
         uses: docker/build-push-action@v5
         with:
           push: true
-          file: ./Dockerfile # Assuming Dockerfile is directly in trading_ui
-          context: ./          # Context is trading_ui directory
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/trading-ui:latest
+          file: ./Dockerfile # Assuming Dockerfile is at the root
+          context: ./          # Context is the root directory
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/trading-authorisation:latest
           # Add build-args if needed
