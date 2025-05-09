@@ -61,6 +61,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             String json = String.format("{\"error\": \"%s\"}", e.getMessage().replace("\"", "\\\""));
             response.getWriter().write(json);
             response.getWriter().flush();
+            System.out.println("jwt error");
             return; // important: prevent further filter chain execution
         }
         
