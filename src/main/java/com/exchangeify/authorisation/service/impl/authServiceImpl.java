@@ -37,21 +37,25 @@ public class authServiceImpl implements authService{
         if(userRepository.existsByEmailId(userInput.getEmailId())){
             return new ResponseEntity<>("User already exist",HttpStatus.BAD_REQUEST);
         }
-        Date currentDate = new Date();
-        UserEntity user = new UserEntity();
-        user.setEmailId(userInput.getEmailId());
-        user.setCreatedDate(currentDate.toString());
-        user.setAuthProvider("manual");
-        user.setFirstName(userInput.getFirstName());
-        user.setLastName(userInput.getLastName());
-        user.setIsValid("false");
-        user.setPhoneNumber(userInput.getPhoneNumber());
-        user.setPassword(passwordEncoder.encode(userInput.getPassword()));
+        try{
+            Date currentDate = new Date();
+            UserEntity user = new UserEntity();
+            user.setEmailId(userInput.getEmailId());
+            user.setCreatedDate(currentDate.toString());
+            user.setAuthProvider("manual");
+            user.setFirstName(userInput.getFirstName());
+            user.setLastName(userInput.getLastName());
+            user.setIsValid("false");
+            user.setPhoneNumber(userInput.getPhoneNumber());
+            user.setPassword(passwordEncoder.encode(userInput.getPassword()));
 
-        RoleEntity roles = roleRepository.findByName("USER").get();
-        user.setRoles(Collections.singletonList(roles));
-        userRepository.save(user);
-        return new ResponseEntity<>("user registered", HttpStatus.OK);
+            RoleEntity roles = roleRepository.findByName("USER").get();
+            user.setRoles(Collections.singletonList(roles));
+            userRepository.save(user);
+            return new ResponseEntity<>("user registered", HttpStatus.OK);
+        } catch(Exception e){
+            return new ResponseEntity<>("Error in registration",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     // @Override
     // public UserEntity save(UserEntity entity) {

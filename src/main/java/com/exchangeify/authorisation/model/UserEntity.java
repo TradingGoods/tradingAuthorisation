@@ -26,7 +26,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String emailId;
@@ -40,14 +40,19 @@ public class UserEntity {
     private String isValid;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_Id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_Id", referencedColumnName = "id"))
+    // @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_Id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_Id", referencedColumnName = "id"))
+    @JoinTable(
+    name = "user_roles",
+    joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+    inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+
     private List<RoleEntity> roles = new ArrayList<>();
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
