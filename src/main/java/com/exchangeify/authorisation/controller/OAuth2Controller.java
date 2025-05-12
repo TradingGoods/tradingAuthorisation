@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.exchangeify.authorisation.dto.JwtResponseDTO;
 import com.exchangeify.authorisation.dto.LoginRequestDTO;
-import com.exchangeify.authorisation.service.OAuth2Service;
 import com.exchangeify.authorisation.service.authService;
 import com.exchangeify.authorisation.utils.JwtUtil;
 
