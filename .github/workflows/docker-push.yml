@@ -5,7 +5,7 @@ on:
     branches:
       - main # Or your auth service's main branch
     paths:
-      - '/**' # Or a more specific path if your Dockerfile is nested
+      - '**' # Or a more specific path if your Dockerfile is nested
 
 jobs:
   build-and-push:
