@@ -16,7 +16,6 @@ import com.exchangeify.authorisation.model.RoleEntity;
 import com.exchangeify.authorisation.model.UserEntity;
 import com.exchangeify.authorisation.repository.RoleRepository;
 import com.exchangeify.authorisation.repository.UserRepository;
-// import com.exchangeify.authorisation.repository.userRepository;
 import com.exchangeify.authorisation.service.authService;
 
 @Service
@@ -30,7 +29,6 @@ public class authServiceImpl implements authService{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    // private userRepository myUserRepository;
 
     @Override
     public ResponseEntity<String> registerUser(RegisterDTO userInput){
@@ -57,25 +55,6 @@ public class authServiceImpl implements authService{
             return new ResponseEntity<>("Error in registration",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    // @Override
-    // public UserEntity save(UserEntity entity) {
-    //     UserEntity savedUser =  myUserRepository.save(entity);
-    //     return savedUser;
-    // }
-
-    // @Override
-    // public List<UserEntity> findAll() {
-    //     return myUserRepository.findAll();
-    // }
-
-    // @Override
-    // public UserEntity findById(int id) {
-    //     return myUserRepository.findById(id).orElse(null);
-    // }
-
-    // @Override
-    // public void deleteById(String id) {
-    //     // myUserRepository.deleteById(id);
-    // }
+    
     
 }
