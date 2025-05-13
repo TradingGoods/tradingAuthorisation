@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.exchangeify.authorisation.model.UserEntity;
 
 
-public interface UserRepository extends JpaRepository<UserEntity,Integer>{
+public interface temp_user_repository extends JpaRepository<UserEntity,Integer>{
 
     Optional<UserEntity> findByEmailId(String emailId);
 

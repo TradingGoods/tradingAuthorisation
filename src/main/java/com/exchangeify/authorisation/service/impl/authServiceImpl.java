@@ -15,14 +15,14 @@ import com.exchangeify.authorisation.dto.RegisterDTO;
 import com.exchangeify.authorisation.model.RoleEntity;
 import com.exchangeify.authorisation.model.UserEntity;
 import com.exchangeify.authorisation.repository.RoleRepository;
-import com.exchangeify.authorisation.repository.UserRepository;
+import com.exchangeify.authorisation.repository.temp_user_repository;
 import com.exchangeify.authorisation.service.authService;
 
 @Service
 public class authServiceImpl implements authService{
 
     @Autowired
-    private UserRepository userRepository;
+    private temp_user_repository userRepository;
 
     @Autowired
     private RoleRepository roleRepository;
