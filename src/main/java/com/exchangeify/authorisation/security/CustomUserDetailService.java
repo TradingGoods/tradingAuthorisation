@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
 
 import com.exchangeify.authorisation.model.RoleEntity;
 import com.exchangeify.authorisation.model.UserEntity;
-import com.exchangeify.authorisation.repository.temp_user_repository;
+import com.exchangeify.authorisation.repository.UserRepository;
 
 
 @Service
 public class CustomUserDetailService implements UserDetailsService{
 
     @Autowired
-    private temp_user_repository userRepository;
+    private UserRepository userRepository;
 
 
     @Override
