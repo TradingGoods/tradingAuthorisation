@@ -35,8 +35,6 @@ public class OAuth2Controller {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private authService myAuthService; 
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -57,7 +55,6 @@ public class OAuth2Controller {
             response.put("auth_provider","google");
 
             return ResponseEntity.ok(response);
-            // Process the claims as needed
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token: " + e.getMessage());
@@ -66,10 +63,6 @@ public class OAuth2Controller {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
-        // Authentication logic here
-        logger.info("Login request received for email: " + request.getEmailId());
-        logger.info("Login request received for password: " + request.getPassword());
-        logger.info("Login request received for request: " + request);
 
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword())
