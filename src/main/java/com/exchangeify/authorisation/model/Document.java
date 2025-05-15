@@ -26,13 +26,11 @@ public class Document {
 
     private LocalDateTime uploadDate;
 
-    // Store other metadata as a JSON or separate columns based on requirements
     @ElementCollection
     @MapKeyColumn(name = "metadata_key")
     @Column(name = "metadata_value", columnDefinition = "TEXT")
     private Map<String, String> metadata;
 
-    // Constructors, Getters, Setters
     public Document() {
     }
     public Document(String title, String content, String fileType, String author, LocalDateTime uploadDate, Map<String, String> metadata) {

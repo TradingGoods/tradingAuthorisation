@@ -39,6 +39,20 @@ public class OAuth2Controller {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword())
+        );
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String jwt = jwtUtil.generateToken(userDetails);
+        logger.info("User logged in: {}", userDetails.getUsername());
+
+        return ResponseEntity.ok(new JwtResponseDTO(jwt));
+    }
+
    @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> requestBody) {
         String token = requestBody.get("credential");
@@ -61,17 +75,6 @@ public class OAuth2Controller {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
-
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword())
-        );
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String jwt = jwtUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new JwtResponseDTO(jwt));
-    }
+   
 }
 

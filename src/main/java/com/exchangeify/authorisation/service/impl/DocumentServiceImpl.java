@@ -41,13 +41,12 @@ public class DocumentServiceImpl implements DocumentService {
         document.setUploadDate(LocalDateTime.now());
         document.setAuthor(author);
         document.setMetadata(additionalMetadata);
-        // You might want to extract more metadata using Tika
         return documentRepository.save(document);
     }
 
     private String extractContent(MultipartFile file) throws IOException, TikaException, SAXException {
         Parser parser = new AutoDetectParser();
-        BodyContentHandler handler = new BodyContentHandler(-1); // -1 for unlimited text
+        BodyContentHandler handler = new BodyContentHandler(-1);
         Metadata metadata = new Metadata();
         try (InputStream stream = file.getInputStream()) {
             parser.parse(stream, handler, metadata, new ParseContext());
@@ -63,9 +62,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     public List<Document> searchDocuments(String keyword) {
-        // Choose between basic keyword search or full-text search based on your database and requirements
         return documentRepository.searchByKeyword("%" + keyword.toLowerCase() + "%");
-        // return documentRepository.fullTextSearch(keyword);
     }
 
     public Page<Document> filterDocuments(String author, String fileType, Pageable pageable) {

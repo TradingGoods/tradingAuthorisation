@@ -17,11 +17,9 @@ public class RoleEntity {
 
     private String name;
 
-    // No-argument constructor (required by JPA)
     public RoleEntity() {
     }
 
-    // Getters and setters
     public int getId() {
         return id;
     }

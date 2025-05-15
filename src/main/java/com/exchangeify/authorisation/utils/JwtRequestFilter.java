@@ -53,7 +53,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }
             }
         } catch (SignatureException | ExpiredJwtException | MalformedJwtException e) {
-            // Send custom response and STOP the filter chain
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -62,7 +61,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             response.getWriter().write(json);
             response.getWriter().flush();
             System.out.println("jwt error");
-            return; // important: prevent further filter chain execution
+            return;
         }
         
         chain.doFilter(request, response);

@@ -16,13 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.exchangeify.authorisation.security.CustomUserDetailService;
 
@@ -31,7 +27,7 @@ import com.exchangeify.authorisation.security.CustomUserDetailService;
 public class WebConfig {
 
     @Autowired
-    JwtRequestFilter jwtRequestFilter; // JWT filter to intercept requests
+    JwtRequestFilter jwtRequestFilter;
 
     private CustomUserDetailService customUserDetailService;
     public WebConfig(CustomUserDetailService customUserDetailService) {
@@ -41,17 +37,6 @@ public class WebConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtRequestFilter jwtFilter) throws Exception {
-        // http
-        //     .csrf(csrf -> csrf.disable()) // Disable CSRF if you're using JWTs
-        //     .authorizeHttpRequests(auth -> auth
-        //         .requestMatchers("/api/auth/**").permitAll() // Permit authentication for these paths
-        //         .anyRequest().authenticated() // Secure other requests
-        //     )
-        //     .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter
-        //     .formLogin(form -> form.disable()) // Disable form login if you're using JWT
-        //     .httpBasic(httpBasic -> httpBasic.disable());
-
-        // return http.build();
         return http
         .csrf(csrf -> csrf.disable())
         .cors(Customizer.withDefaults())
@@ -69,7 +54,8 @@ public class WebConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        // config.setAllowedOrigins(List.of("http://localhost:4200")); // for local
+        config.setAllowedOrigins(List.of("http://localhost:8081")); // for docker
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
@@ -95,19 +81,7 @@ public class WebConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(customUserDetailService);
-        authProvider.setPasswordEncoder(passwordEncoder()); // BCrypt recommended
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
-    // @Bean
-    // public HttpFirewall allowHeaderFirewall() {
-    //     StrictHttpFirewall firewall = new StrictHttpFirewall();
-    //     firewall.setAllowUrlEncodedPercent(true);
-    //     firewall.setAllowSemicolon(true);
-    //     firewall.setAllowBackSlash(true);
-    //     firewall.setAllowUrlEncodedSlash(true);
-    //     firewall.setAllowUrlEncodedPeriod(true);
-    //     firewall.setAllowHeaderNames(List.of("Authorization"));
-    //     return firewall;
-    // }
 }

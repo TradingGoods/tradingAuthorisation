@@ -25,24 +25,4 @@ public class authController {
         return response;
         
     }
-    
-    // @PostMapping
-    // public UserEntity createEntity(@RequestBody UserEntity entity) {
-    //     return myAuthService.save(entity);
-    // }
-
-    // @GetMapping
-    // public List<UserEntity> getAllEntities() {
-    //     return myAuthService.findAll();
-    // }
-
-    // @GetMapping("/{id}")
-    // public UserEntity getEntityById(@PathVariable int id) {
-    //     return myAuthService.findById(id);
-    // }
-
-    // @DeleteMapping("/{id}")
-    // public void deleteEntityById(@PathVariable String id) {
-    //     myAuthService.deleteById(id);
-    // }
 }

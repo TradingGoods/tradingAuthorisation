@@ -41,8 +41,8 @@ public class JwtUtil {
                 .setSubject(userName)
                 .setIssuer("backend")
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // Token validity
-                .signWith(createKey(password)) // Use the secret key to sign the JWT
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(createKey(password))
                 .compact();
     }
 
@@ -75,34 +75,27 @@ public class JwtUtil {
     }
 
     public static String getKidFromToken(String token) {
-        // Split the token to separate the header, payload, and signature
         String[] tokenParts = token.split("\\.");
         
         if (tokenParts.length < 2) {
             throw new IllegalArgumentException("Invalid JWT token");
         }
         
-        // Decode the header
         String headerJson = new String(Base64.getUrlDecoder().decode(tokenParts[0]));
-        
-        // Parse the header as JSON to retrieve the 'kid'
         JSONObject header = new JSONObject(headerJson);
         return header.optString("kid", null);
     }
 
 
-    // Method to fetch and parse the public key based on the `kid`
     private PublicKey getGooglePublicKey(String kid) throws Exception {
-        // Fetch Google’s public keys
         JsonNode keys = objectMapper.readTree(new URL(GOOGLE_CERTS_URL)).get("keys");
 
-        // Locate the key with matching `kid`
         for (JsonNode key : keys) {
             if (key.get("kid").asText().equals(kid)) {
                 String modulus = key.get("n").asText();
                 String exponent = key.get("e").asText();
 
-                // Decode and build the RSA public key
+
                 byte[] decodedModulus = Base64.getUrlDecoder().decode(modulus);
                 byte[] decodedExponent = Base64.getUrlDecoder().decode(exponent);
                 return buildRsaPublicKey(decodedModulus, decodedExponent);
@@ -111,7 +104,6 @@ public class JwtUtil {
         throw new IllegalArgumentException("No matching key found for kid: " + kid);
     }
 
-    // Helper method to build RSA public key
     private PublicKey buildRsaPublicKey(byte[] modulus, byte[] exponent) throws Exception {
         java.math.BigInteger modBigInt = new java.math.BigInteger(1, modulus);
         java.math.BigInteger expBigInt = new java.math.BigInteger(1, exponent);
@@ -125,7 +117,7 @@ public class JwtUtil {
                     @Override
                     public PublicKey resolveSigningKey(io.jsonwebtoken.JwsHeader header, Claims claims) {
                         String kid = header.getKeyId();
-                        return googlePublicKeys.get(kid); // Use the kid to find the correct key
+                        return googlePublicKeys.get(kid);
                     }
                 })
                 .build()
@@ -141,7 +133,7 @@ public class JwtUtil {
             public void run() {
                 fetchGooglePublicKeys();
             }
-        }, 0, 6 * 60 * 60 * 1000); // Every 6 hours
+        }, 0, 6 * 60 * 60 * 1000);
     }
     private void fetchGooglePublicKeys() {
         try {
@@ -185,8 +177,8 @@ public class JwtUtil {
         return expiration.before(new Date());
     }
 
-    private final String SECRET_KEY = "your-very-secret-key-must-be-at-least-256-bits";
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+    private final String SECRET_KEY = "temporary-secret-key";
+    private final long EXPIRATION_TIME = 1000 * 60 * 60;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

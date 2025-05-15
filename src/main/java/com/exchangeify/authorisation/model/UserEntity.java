@@ -3,6 +3,7 @@ package com.exchangeify.authorisation.model;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -36,11 +37,10 @@ public class UserEntity {
     private String createdDate;
     private String privateKey;
     private String password;
-    private String authProvider; // 'GOOGLE' or 'BASIC'
+    private String authProvider;
     private String isValid;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    // @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_Id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_Id", referencedColumnName = "id"))
     @JoinTable(
     name = "user_roles",
     joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
@@ -150,6 +150,18 @@ public class UserEntity {
 
     public void setRoles(List<RoleEntity> roles) {
         this.roles = roles;
+    }
+
+     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserEntity)) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(id, that.id) && Objects.equals(firstName, that.firstName) && Objects.equals(lastName, that.lastName) && Objects.equals(emailId, that.emailId) && Objects.equals(profilePicUrl, that.profilePicUrl) && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(createdDate, that.createdDate) && Objects.equals(privateKey, that.privateKey) && Objects.equals(password, that.password) && Objects.equals(authProvider, that.authProvider) && Objects.equals(isValid, that.isValid);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 }
