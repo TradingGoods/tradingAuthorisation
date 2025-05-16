@@ -54,8 +54,11 @@ public class WebConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // config.setAllowedOrigins(List.of("http://localhost:4200")); // for local
-        config.setAllowedOrigins(List.of("http://localhost:8081")); // for docker
+        config.setAllowedOrigins(List.of(
+            "http://localhost:4200", // for local
+            "http://localhost:8081", // for Docker
+            "http://albforecs-778671670.eu-north-1.elb.amazonaws.com" // ECS frontend
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
