@@ -57,8 +57,7 @@ public class WebConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
             "http://localhost:4200", // for local
-            "http://localhost:80", // for Docker
-            "http://albforecs-778671670.eu-north-1.elb.amazonaws.com" // ECS frontend
+            "http://localhost:80" // for Docker
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
