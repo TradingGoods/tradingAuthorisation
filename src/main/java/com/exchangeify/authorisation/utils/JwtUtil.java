@@ -20,15 +20,16 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SigningKeyResolverAdapter;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Encoders;
+
 import java.util.function.Function;
+
+import javax.crypto.SecretKey;
 @Service
 public class JwtUtil {
 
@@ -177,7 +178,8 @@ public class JwtUtil {
         return expiration.before(new Date());
     }
 
-    private final String SECRET_KEY = "temporary-secret-key";
+    SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final String SECRET_KEY = Encoders.BASE64.encode(secretKey.getEncoded());
     private final long EXPIRATION_TIME = 1000 * 60 * 60;
 
     private Key getSigningKey() {
