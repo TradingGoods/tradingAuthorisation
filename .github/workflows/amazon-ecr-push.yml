@@ -27,9 +27,13 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build and push backend image
-        run: |
-          docker build -t $ECR_BACKEND:latest
-          docker push $ECR_BACKEND:latest
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ env.ECR_REPO }}:latest
+          no-cache: true
 
       - name: Update ECS backend service
         run: |
