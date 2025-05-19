@@ -31,10 +31,3 @@ jobs:
           file: ./Dockerfile
           context: ./
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/trading-authorisation:latest
-      
-      - name: Force ECS service to use new image (frontend)
-        run: |
-          aws ecs update-service \
-            --cluster exchangify-cluster \
-            --service backend-service \
-            --force-new-deployment

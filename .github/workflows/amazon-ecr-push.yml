@@ -1,4 +1,51 @@
-name: CI/CD to ECS for backend
+# name: CI/CD to ECS for backend
+
+# on:
+#   push:
+#     branches: [main]
+
+# env:
+#   AWS_REGION: ${{ secrets.AWS_REGION }}
+#   ECR_FRONTEND: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-repo
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout source code
+#         uses: actions/checkout@v3
+
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
+
+#       - name: Login to Amazon ECR
+#         uses: aws-actions/amazon-ecr-login@v1
+
+#       - name: Build and push backend image
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: .
+#           file: Dockerfile
+#           push: true
+#           tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-repo:latest
+#           no-cache: true
+
+#       - name: Update ECS backend service
+#         run: |
+#           aws ecs update-service \
+#             --cluster exchangify-cluster \
+#             --service backend-service \
+#             --force-new-deployment
+
+
+
+
+name: CI/CD to ECS Blue/Green
 
 on:
   push:
@@ -6,7 +53,7 @@ on:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_FRONTEND: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-repo
+  ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-repo
 
 jobs:
   deploy:
@@ -26,18 +73,29 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and push backend image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile
           push: true
-          tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-repo:latest
+          tags: ${{ env.ECR_URI }}:latest
           no-cache: true
 
-      - name: Update ECS backend service
+      - name: Replace image URI in taskdef.json
         run: |
-          aws ecs update-service \
-            --cluster exchangify-cluster \
-            --service backend-service \
-            --force-new-deployment
+          sed -i 's|IMAGE_URI|${{ env.ECR_URI }}:latest|' taskdef.json
+
+      - name: Register ECS task definition
+        run: |
+          aws ecs register-task-definition --cli-input-json file://taskdef.json
+
+      - name: Trigger Blue/Green deployment via CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ secrets.CODEDEPLOY_APP }} \
+            --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
+            --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
+            --revision file://appspec.yaml \
+            --description "GitHub Actions Blue/Green deployment"
+
