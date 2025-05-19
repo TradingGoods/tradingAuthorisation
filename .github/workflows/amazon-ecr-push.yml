@@ -54,6 +54,7 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend-repo
+  S3_BUCKET: exchangify
 
 jobs:
   deploy:
@@ -90,12 +91,19 @@ jobs:
         run: |
           aws ecs register-task-definition --cli-input-json file://taskdef.json
 
+      - name: Upload appspec.yaml to S3
+        run: |
+          aws s3 cp appspec.yaml s3://${{ env.S3_BUCKET }}/appspec.yaml
+
+      - name: Upload taskdef.json to S3
+        run: |
+          aws s3 cp taskdef.json s3://${{ env.S3_BUCKET }}/taskdef.json
+
       - name: Trigger Blue/Green deployment via CodeDeploy
         run: |
           aws deploy create-deployment \
             --application-name ${{ secrets.CODEDEPLOY_APP }} \
             --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
             --deployment-config-name CodeDeployDefault.ECSAllAtOnce \
-            --revision file://appspec.yaml \
+            --revision "{\"revisionType\":\"S3\",\"s3Location\":{\"bucket\":\"${{ env.S3_BUCKET }}\",\"key\":\"appspec.yaml\",\"bundleType\":\"yaml\"}}" \
             --description "GitHub Actions Blue/Green deployment"
-
