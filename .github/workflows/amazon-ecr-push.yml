@@ -91,14 +91,6 @@ jobs:
         run: |
           aws ecs register-task-definition --cli-input-json file://taskdef.json
 
-      - name: Upload appspec.yaml to S3
-        run: |
-          aws s3 cp appspec.yaml s3://${{ env.S3_BUCKET }}/appspec.yaml
-
-      - name: Upload taskdef.json to S3
-        run: |
-          aws s3 cp taskdef.json s3://${{ env.S3_BUCKET }}/taskdef.json
-
       - name: Trigger Blue/Green deployment via CodeDeploy
         run: |
           aws deploy create-deployment \
